@@ -35,6 +35,7 @@ from cdmtaskservice.mongo import MongoDAO
 from cdmtaskservice.nersc.client import NERSCSFAPIClientProvider
 from cdmtaskservice.notifications.kafka_checker import KafkaChecker
 from cdmtaskservice.pipelines.metaassembly import v0_1_0 as metaassembly_v0_1_0
+from cdmtaskservice.pipelines.metaassembly import v0_2_0 as metaassembly_v0_2_0
 from cdmtaskservice.pipelines.readsqc import v0_1_0 as readsqc_v0_1_0
 from cdmtaskservice.pipelines.registry import PipelineRegistry
 from cdmtaskservice.refdata import Refdata
@@ -294,6 +295,7 @@ def _create_pipeline_registry(logr: logging.Logger) -> PipelineRegistry:
     registry = PipelineRegistry()
     registry.register(readsqc_v0_1_0.init())
     registry.register(metaassembly_v0_1_0.init())
+    registry.register(metaassembly_v0_2_0.init())
     logr.info("Done")
     return registry
 

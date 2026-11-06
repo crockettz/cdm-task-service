@@ -5,6 +5,16 @@ https://github.com/kbaseincubator/metaAssembly
 
 One module per version lives under this package, e.g. `v0_1_0.py`.
 
+## Versions
+
+* **0.1.0**: pinned to upstream commit `5e11066`. Uploads 9 outputs, including the read mapping
+  BAM, SAM.gz, and bbcms corrected reads FASTQ. The uploads of those 3 large, roughly input sized
+  files fail from NERSC on large inputs.
+* **0.2.0**: pinned to the upstream `drop-sam-bam-outputs` branch, based on `5e11066`. The WDL no
+  longer generates the BAM or SAM.gz (bbmap runs for coverage stats only), and the bbcms FASTQ,
+  which is still generated as the assembler's input, is no longer uploaded. Uploads 6 outputs.
+  Inputs are identical to 0.1.0.
+
 This version only supports the short-read (Illumina) path (`shortRead=true`); the long-read
 (PacBio/Flye) path is not exposed.
 
@@ -13,7 +23,7 @@ This version only supports the short-read (Illumina) path (`shortRead=true`); th
 The workflow's own `memory`/`threads` inputs (`String?`, no default) only reach a handful of
 BBTools calls in the short-read path, and even there their effect is limited - full detail is in
 the upstream repo's `memory_and_threads.md` and `bbtools_shortreadss_instances.md` (as of commit
-`6aad3c9`, the version this pipeline definition is pinned to):
+`5e11066`, the version this pipeline definition is pinned to):
 
 * **`memory`**: every task that consumes it only uses it to set a JVM `-Xmx` heap flag
   (`bbcms`, `create_agp`, `read_mapping_pairs`), defaulting to `-Xmx105G` if unset. Each of those
@@ -32,7 +42,7 @@ the upstream repo's `memory_and_threads.md` and `bbtools_shortreadss_instances.m
   `select_first([threads, system_cpu])` if `threads` is unset, where `system_cpu` is the full
   core count visible via `/proc/cpuinfo` - **not** the `16` CPUs actually reserved for that task
   via `runtime.cpu: 16`. On a shared NERSC node, an unset `threads` therefore lets that task
-  oversubscribe the node, spawning far more BBTools/`samtools sort` threads than were scheduled
+  oversubscribe the node, spawning far more BBTools threads (and, in 0.1.0, `samtools sort` threads) than were scheduled
   for it. Passing `threads="16"` closes that gap by matching the task's real CPU reservation.
   It does not, and cannot, control `assy` (metaSPAdes), which always gets its thread count from
   `predict_memory`'s k-mer based tier (16 or 32 depending on estimated complexity) rather than the
